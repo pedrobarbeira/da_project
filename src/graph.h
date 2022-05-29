@@ -1,7 +1,3 @@
-//
-// Created by pbarbeira on 24-05-2022.
-//
-
 #ifndef PROJECT2_GRAPH_H
 #define PROJECT2_GRAPH_H
 
@@ -26,6 +22,7 @@ class Graph {
         bool visited;
         int cap, dist;
         std::list<Edge> adj; // The list of outgoing edges (to adjacent nodes)
+        std::list<Edge> residual;
     };
 
     int n;              // Graph size (vertices are numbered from 1 to n)
@@ -51,6 +48,7 @@ public:
     void addEdge(int src, int dest, int capacity =1, int duration=1) {
         if (src < 1 || src >= n || dest < 1 || dest > n) return;
         nodes[src].adj.push_back(Edge{dest, EdgeWeight{capacity, duration}});
+        nodes[dest].residual.push_back(Edge{src, EdgeWeight{0, duration}});
         if (!hasDir) nodes[dest].adj.push_back(Edge{dest, EdgeWeight{capacity, duration}});
     }
 
@@ -65,16 +63,31 @@ public:
                           << std::endl;
                 edgeCount++;
             }
+            std::cout << "-residual: \n";
+            for(auto e : nodes[i].residual){
+                std::cout << "\tdest: " << e.dest
+                          << "\n\t\tcapacity: " << e.weight.capacity
+                          << "\n\t\tduration: " << e.weight.duration
+                          << std::endl;
+            }
         }
         std::cout << "\nNodes: " << n
                   << "\nEdges: " << edgeCount
                   << std::endl;
     }
 
+    int max_node_capacity(int n){
+        return nodes[n].cap;
+    }
+
+    int size(){
+        return n;
+    }
+
     void max_flow(int src){
-        for(auto node : nodes){
-            node.parent = NULL;
-            node.cap = 0;
+        for(int i=1;i<=n;i++){
+            nodes[i].parent = 0;
+            nodes[i].cap = 0;
         }
         nodes[src].cap = INT32_MAX;
         MaxHeap<int, int> maxHeap(n, -1);
@@ -99,7 +112,7 @@ public:
             std::cout << "No path from " << src << " to " << dest << '\n';
             return ret;
         }
-        while(src != dest){
+        while(dest != src){
             ret.push_back(dest);
             dest=nodes[dest].parent;
         }
@@ -111,6 +124,7 @@ public:
         MinHeap<int, int> q(n, -1);
         for(int i=1;i<=n;i++){
             nodes[i].dist=INT32_MAX;
+            nodes[i].parent=0;
             nodes[i].visited=false;
             q.insert(i, nodes[i].dist);
         }
@@ -122,14 +136,26 @@ public:
             if(!nodes[v].visited){
                 nodes[v].visited=true;
                 for(auto e : nodes[v].adj){
-                    int w;
+                    int w = e.dest;
                     if(!nodes[w].visited && nodes[v].dist+1 < nodes[w].dist){
                         nodes[w].dist=nodes[v].dist+1;
                         nodes[w].parent=v;
+                        q.decreaseKey(w, nodes[w].dist);
                     }
                 }
             }
         }
+    }
+
+    int extract_max_cap(std::vector<int> path){
+        int cap = INT32_MAX;
+        for(unsigned int i=path.size()-1;i>0;i--){
+            for(auto e : nodes[i].adj){
+                if(e.dest==path[i-1])
+                    cap=std::min(cap, e.weight.capacity);
+            }
+        }
+        return cap;
     }
 };
 
