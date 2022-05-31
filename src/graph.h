@@ -106,6 +106,37 @@ public:
         }
     }
 
+    void max_flow_min_dist(int src){
+        for(int i=1;i<=n;i++){
+            nodes[i].parent = 0;
+            nodes[i].cap = 0;
+            nodes[i].dist = INT32_MAX;
+        }
+        nodes[src].cap = INT32_MAX;
+        nodes[src].dist=0;
+        MaxHeap<int, int> maxHeap(n, -1);
+        for(int i = 1; i <= n; i++)
+            maxHeap.insert(i, nodes[i].cap);
+        while(!maxHeap.empty()){
+            int v = maxHeap.removeMax(); //gets node with larger capacity
+            for(auto e : nodes[v].adj){
+                int w = e.dest;
+                if(std::min(nodes[v].cap, e.weight.capacity) > nodes[w].cap){
+                    nodes[w].cap = std::min(nodes[v].cap, e.weight.capacity);
+                    nodes[w].parent = v;
+                    nodes[w].dist=nodes[v].dist+1;
+                    maxHeap.increaseKey(w, nodes[w].cap);
+                }
+                else if(std::min(nodes[v].cap, e.weight.capacity) == nodes[w].cap
+                        && nodes[v].dist+1 < nodes[w].dist) {
+                    nodes[w].parent = v;
+                    nodes[w].dist = nodes[v].dist + 1;
+                    maxHeap.increaseKey(w, nodes[w].cap);
+                }
+            }
+        }
+    }
+
     std::vector<int>path(int src, int dest){
         std::vector<int> ret;
         if(nodes[dest].cap == 0){
@@ -120,16 +151,18 @@ public:
         return ret;
     }
 
-    void dijkstra(int src){
+    void min_dist_max_flow(int src){
         MinHeap<int, int> q(n, -1);
         for(int i=1;i<=n;i++){
             nodes[i].dist=INT32_MAX;
+            nodes[i].cap=0;
             nodes[i].parent=0;
             nodes[i].visited=false;
             q.insert(i, nodes[i].dist);
         }
         nodes[src].dist=0;
         nodes[src].parent=src;
+        nodes[src].cap=INT32_MAX;
         q.insert(src, nodes[src].dist);
         while(!q.empty()){
             int v=q.removeMin();
@@ -140,6 +173,14 @@ public:
                     if(!nodes[w].visited && nodes[v].dist+1 < nodes[w].dist){
                         nodes[w].dist=nodes[v].dist+1;
                         nodes[w].parent=v;
+                        nodes[w].cap = std::min(nodes[v].cap, e.weight.capacity);
+                        q.decreaseKey(w, nodes[w].dist);
+                    }
+                    else if(!nodes[w].visited && nodes[v].dist+1 == nodes[w].dist
+                                && std::min(nodes[v].cap, e.weight.capacity) > nodes[w].cap){
+                        nodes[w].dist=nodes[v].dist+1;
+                        nodes[w].parent=v;
+                        nodes[w].cap = std::min(nodes[v].cap, e.weight.capacity);
                         q.decreaseKey(w, nodes[w].dist);
                     }
                 }

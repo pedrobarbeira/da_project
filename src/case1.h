@@ -90,7 +90,7 @@ void case_1_2(std::string dataset) {
         if (dest <= 0 || dest > graph.size()) std::cout << "Invalid dest\n";
         else break;
     }
-    graph.max_flow(src);
+    graph.max_flow_min_dist(src);
     std::vector<int> path = graph.path(src, dest);
     std::stringstream s;
     s << '(';
@@ -102,7 +102,7 @@ void case_1_2(std::string dataset) {
               << "\nPath: " << s.str() << std::endl;
     s.str("");
     s.clear();
-    graph.dijkstra(src);
+    graph.min_dist_max_flow(src);
     path=graph.path(src, dest);
     int cap = graph.extract_max_cap(path);
     s << '(';
