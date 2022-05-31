@@ -37,7 +37,7 @@ public:
         nodes.push_back(node);
     }
 
-    void addNode(int val){
+    void add_node(int val){
         if(nodes.size() == n+1) return;
         Node node;
         node.parent = 0;
@@ -46,7 +46,7 @@ public:
         nodes.push_back(node);
     }
 
-    void addEdge(int src, int dest, int capacity =1, int duration=1) {
+    void add_edge(int src, int dest, int capacity =1, int duration=1) {
         if (src < 1 || src >= n || dest < 1 || dest > n) return;
         nodes[src].adj.push_back(Edge{dest, 0, EdgeWeight{capacity, duration}});
         nodes[dest].residual.push_back(Edge{src, 0, EdgeWeight{0, duration}});

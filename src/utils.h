@@ -29,14 +29,14 @@ Graph readFile(std::string path){
     infile >> noEdges;
     Graph graph(noNodes, true);
     for(int i = 0; i < noNodes; i++)
-        graph.addNode(i);
+        graph.add_node(i);
     int src, dest, capacity, duration;
     while(noEdges > 0){
         infile >> src;
         infile >> dest;
         infile >> capacity;
         infile >> duration;
-        graph.addEdge(src, dest, capacity, duration);
+        graph.add_edge(src, dest, capacity, duration);
         noEdges--;
     }
     return graph;
