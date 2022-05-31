@@ -137,20 +137,6 @@ public:
         }
     }
 
-    std::vector<int>path(int src, int dest){
-        std::vector<int> ret;
-        if(nodes[dest].cap == 0){
-            std::cout << "No path from " << src << " to " << dest << '\n';
-            return ret;
-        }
-        while(dest != src){
-            ret.push_back(dest);
-            dest=nodes[dest].parent;
-        }
-        ret.push_back(src);
-        return ret;
-    }
-
     void min_dist_max_flow(int src){
         MinHeap<int, int> q(n, -1);
         for(int i=1;i<=n;i++){
@@ -177,7 +163,7 @@ public:
                         q.decreaseKey(w, nodes[w].dist);
                     }
                     else if(!nodes[w].visited && nodes[v].dist+1 == nodes[w].dist
-                                && std::min(nodes[v].cap, e.weight.capacity) > nodes[w].cap){
+                            && std::min(nodes[v].cap, e.weight.capacity) > nodes[w].cap){
                         nodes[w].dist=nodes[v].dist+1;
                         nodes[w].parent=v;
                         nodes[w].cap = std::min(nodes[v].cap, e.weight.capacity);
@@ -186,6 +172,21 @@ public:
                 }
             }
         }
+    }
+
+
+    std::vector<int>path(int src, int dest){
+        std::vector<int> ret;
+        if(nodes[dest].cap == 0){
+            std::cout << "No path from " << src << " to " << dest << '\n';
+            return ret;
+        }
+        while(dest != src){
+            ret.push_back(dest);
+            dest=nodes[dest].parent;
+        }
+        ret.push_back(src);
+        return ret;
     }
 
     int extract_max_cap(std::vector<int> path){
