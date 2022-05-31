@@ -2,7 +2,14 @@
 #include "case1.h"
 
 int main() {
-    std::string FILEPATH = "tests/test.txt";
-    case_1_2(FILEPATH);
+    Graph graph(0);
+    try {
+        graph = readFile(TEST_SET_1);
+    }
+    catch (FileNotFound &e) {
+        std::cout << e.what();
+        return 1;
+    }
+    case_1_2(graph);
     return 0;
 }

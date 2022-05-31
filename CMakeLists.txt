@@ -12,4 +12,5 @@ add_executable(da_project
         src/maxHeap.h
         src/exception.h
         src/minHeap.h
-        src/case1.h)
+        src/case1.h
+        src/case2.h)

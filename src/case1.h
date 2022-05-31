@@ -6,42 +6,12 @@
 #include <sstream>
 #include "graph.h"
 #include "exception.h"
+#include "utils.h"
 
-Graph readFile(std::string path){
-    std::ifstream infile(path);
-    if(!infile.is_open()){
-        std::cout << "Error reading file " << path << '\n';
-        throw FileNotFound(path);
-    }
-    int noNodes, noEdges;
-    infile >> noNodes;
-    infile >> noEdges;
-    Graph graph(noNodes, true);
-    for(int i = 0; i < noNodes; i++)
-        graph.addNode(i);
-    int src, dest, capacity, duration;
-    while(noEdges > 0){
-        infile >> src;
-        infile >> dest;
-        infile >> capacity;
-        infile >> duration;
-        graph.addEdge(src, dest, capacity, duration);
-        noEdges--;
-    }
-    return graph;
-}
 
-void case_1_1(std::string dataset) {
-    Graph graph(0);
-    try {
-        graph = readFile(dataset);
-    }
-    catch (FileNotFound &e) {
-        std::cout << e.what();
-        return;
-    }
+void case_1_1(Graph& graph) {
     int src, dest;
-    std::cout << "### Case 1 ###\n";
+    std::cout << "### Case 1.2 ###\n";
     while (1) {
         std::cout << "Source: ";
         std::cin >> src;
@@ -67,17 +37,9 @@ void case_1_1(std::string dataset) {
     s.clear();
 }
 
-void case_1_2(std::string dataset) {
-    Graph graph(0);
-    try {
-        graph = readFile(dataset);
-    }
-    catch (FileNotFound &e) {
-        std::cout << e.what();
-        return;
-    }
+void case_1_2(Graph& graph) {
     int src, dest;
-    std::cout << "### Case 1 ###\n";
+    std::cout << "### Case 1.2 ###\n";
     while (1) {
         std::cout << "Source: ";
         std::cin >> src;
