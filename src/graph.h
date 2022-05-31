@@ -200,6 +200,19 @@ public:
         }
         return cap;
     }
+
+    void printflow(){
+        for(int i=1;i<=n;i++){
+            std::cout << i << "\nNormal:\n";
+            for(auto e : nodes[i].adj){
+                std::cout << "\tdest: " << e.dest << " flow: " << e.flow << std::endl;
+            }
+            std::cout << "\nResidual:\n";
+            for(auto e : nodes[i].residual){
+                std::cout << "\tdest: " << e.dest << " flow: " << e.flow << std::endl;
+            }
+        }
+    }
 };
 
 #endif //PROJECT2_GRAPH_H

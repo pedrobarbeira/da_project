@@ -10,6 +10,6 @@ int main() {
         std::cout << e.what();
         return 1;
     }
-    case_1_2(graph);
+    graph.printflow();
     return 0;
 }
