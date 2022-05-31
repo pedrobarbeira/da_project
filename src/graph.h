@@ -201,7 +201,7 @@ public:
         return cap;
     }
 
-    void printflow(){
+    void print_flow(){
         for(int i=1;i<=n;i++){
             std::cout << i << "\nNormal:\n";
             for(auto e : nodes[i].adj){
