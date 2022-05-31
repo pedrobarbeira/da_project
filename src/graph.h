@@ -14,6 +14,7 @@ class Graph {
     };
     struct Edge {
         int dest;   // Destination node
+        int flow;
         EdgeWeight weight; // An integer weight
     };
 
@@ -47,9 +48,9 @@ public:
 
     void addEdge(int src, int dest, int capacity =1, int duration=1) {
         if (src < 1 || src >= n || dest < 1 || dest > n) return;
-        nodes[src].adj.push_back(Edge{dest, EdgeWeight{capacity, duration}});
-        nodes[dest].residual.push_back(Edge{src, EdgeWeight{0, duration}});
-        if (!hasDir) nodes[dest].adj.push_back(Edge{dest, EdgeWeight{capacity, duration}});
+        nodes[src].adj.push_back(Edge{dest, 0, EdgeWeight{capacity, duration}});
+        nodes[dest].residual.push_back(Edge{src, 0, EdgeWeight{0, duration}});
+        if (!hasDir) nodes[dest].adj.push_back(Edge{dest, 0, EdgeWeight{capacity, duration}});
     }
 
     void print(){
