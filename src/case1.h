@@ -25,8 +25,6 @@ Graph readFile(std::string path){
         infile >> dest;
         infile >> capacity;
         infile >> duration;
-        graph.addNode(src);
-        graph.addNode(dest);
         graph.addEdge(src, dest, capacity, duration);
         noEdges--;
     }
