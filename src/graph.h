@@ -2,6 +2,7 @@
 #define PROJECT2_GRAPH_H
 
 #include <iostream>
+#include <fstream>
 #include <list>
 #include <stack>
 #include "exception.h"

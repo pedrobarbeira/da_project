@@ -25,7 +25,7 @@ class ParetoGraph {
     };
 
     struct Node {
-        int dist, cpt;
+        MaxHeap<int, int> capDist();
         std::vector<std::vector<int>> parents;
         std::vector<int> cap;
         std::list<Edge> adj; // The list of outgoing edges (to adjacent nodes)
@@ -75,10 +75,13 @@ public:
         return n;
     }
 
-    void max_capacity_min_distance(int src){
+    
+
+    /*
+    void max_capacity_min_dist(int src){
         for(int i=1;i<=n;i++){
-            nodes[i].dist = 0;
             nodes[i].cpt = 0;
+            nodes[i].dist = INT32_MAX;
         }
         nodes[src].cpt = INT32_MAX;
         nodes[src].dist=0;
@@ -95,37 +98,17 @@ public:
                     maxHeap.increaseKey(w, nodes[w].cpt);
                 }
                 else if(std::min(nodes[v].cpt, e.weight.capacity) == nodes[w].cpt
-                        && nodes[v].dist+1 < nodes[w].dist){
-                    nodes[w].dist=nodes[v].dist+1;
+                        && nodes[v].dist+1 < nodes[w].dist) {
+                    nodes[w].dist = nodes[v].dist + 1;
+                    maxHeap.increaseKey(w, nodes[w].cpt);
                 }
             }
         }
-    }
-
-    int max_distance(int src){
-        int max = 0;
-        for(int i=1;i<=n;i++)
-            nodes[i].dist = 0;
-        std::queue<int> q;
-        q.push(src);
-        while(!q.empty()){
-            int v = q.front(); //gets node with larger capacity
-            q.pop();
-            for(auto e : nodes[v].adj){
-                int w = e.dest;
-                if(nodes[v].dist+1> nodes[w].dist){
-                    nodes[w].dist = nodes[v].dist+1;
-                    max = std::max(nodes[w].dist, max);
-                    q.push(w);
-                }
-            }
-        }
-        return max;
     }
 
     void pareto_optimal(int src, int dest){
-        max_capacity_min_distance(src);
-        int min_dist=nodes[dest].dist;
+        max_capacity_min_dist(src);
+        int min_dist=4;
         for(int i=1;i<=n;i++){
             nodes[i].parents.clear();
             for(int j=0;j<=min_dist;j++) {
@@ -154,7 +137,7 @@ public:
                 q.push(w);
             }
         }
-    }
+    }*/
 
     void path_builder(int src, int dest, int dist, std::vector<int>& path, std::vector<std::vector<int>>& ret){
         if(dist==0)
