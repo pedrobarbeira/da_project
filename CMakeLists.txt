@@ -14,4 +14,5 @@ add_executable(da_project
         src/minHeap.h
         src/case1.h
         src/case2.h
-        src/graph_pareto.h)
+        src/paretograph.h
+        src/fulkersongraph.h)

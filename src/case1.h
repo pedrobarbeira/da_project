@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "graph.h"
-#include "graph_pareto.h"
+#include "paretograph.h"
 #include "exception.h"
 #include "utils.h"
 
@@ -55,7 +55,7 @@ void case_1_2() {
         else break;
     }
 
-    graph.pareto_optimal(src);
+    graph.pareto_optimal(src, dest);
     std::vector<std::vector<int>> paths = graph.optimal_paths(src, dest);
     std::cout << "\n## Paths ##";
     for(auto v : paths){

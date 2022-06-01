@@ -2,8 +2,8 @@
 // Created by pbarbeira on 01-06-2022.
 //
 
-#ifndef DA_PROJECT_GRAPH_PARETO_H
-#define DA_PROJECT_GRAPH_PARETO_H
+#ifndef DA_PROJECT_PARETOGRAPH_H
+#define DA_PROJECT_PARETOGRAPH_H
 
 #include <iostream>
 #include <list>
@@ -25,7 +25,7 @@ class ParetoGraph {
     };
 
     struct Node {
-        int dist;
+        int dist, cpt;
         std::vector<std::vector<int>> parents;
         std::vector<int> cap;
         std::list<Edge> adj; // The list of outgoing edges (to adjacent nodes)
@@ -75,6 +75,33 @@ public:
         return n;
     }
 
+    void max_capacity_min_distance(int src){
+        for(int i=1;i<=n;i++){
+            nodes[i].dist = 0;
+            nodes[i].cpt = 0;
+        }
+        nodes[src].cpt = INT32_MAX;
+        nodes[src].dist=0;
+        MaxHeap<int, int> maxHeap(n, -1);
+        for(int i = 1; i <= n; i++)
+            maxHeap.insert(i, nodes[i].cpt);
+        while(!maxHeap.empty()){
+            int v = maxHeap.removeMax(); //gets node with larger capacity
+            for(auto e : nodes[v].adj){
+                int w = e.dest;
+                if(std::min(nodes[v].cpt, e.weight.capacity) > nodes[w].cpt){
+                    nodes[w].cpt = std::min(nodes[v].cpt, e.weight.capacity);
+                    nodes[w].dist=nodes[v].dist+1;
+                    maxHeap.increaseKey(w, nodes[w].cpt);
+                }
+                else if(std::min(nodes[v].cpt, e.weight.capacity) == nodes[w].cpt
+                        && nodes[v].dist+1 < nodes[w].dist){
+                    nodes[w].dist=nodes[v].dist+1;
+                }
+            }
+        }
+    }
+
     int max_distance(int src){
         int max = 0;
         for(int i=1;i<=n;i++)
@@ -96,11 +123,12 @@ public:
         return max;
     }
 
-    void pareto_optimal(int src){
-        int max_dist=max_distance(src);
+    void pareto_optimal(int src, int dest){
+        max_capacity_min_distance(src);
+        int min_dist=nodes[dest].dist;
         for(int i=1;i<=n;i++){
             nodes[i].parents.clear();
-            for(int j=0;j<=max_dist;j++) {
+            for(int j=0;j<=min_dist;j++) {
                 std::vector<int> vec;
                 nodes[i].parents.push_back(vec);
                 nodes[i].cap.push_back(0);
@@ -117,7 +145,7 @@ public:
             for(auto e:nodes[v].adj){
                 w=e.dest;
                 i=nodes[v].dist+1;
-                if(nodes[w].cap[i] < e.weight.capacity){
+                if(i<=nodes[dest].dist && nodes[w].cap[i] < e.weight.capacity){
                     nodes[w].cap[i]=e.weight.capacity;
                     nodes[w].parents[i].clear();
                     nodes[w].parents[i].push_back(v);
@@ -126,8 +154,6 @@ public:
                 q.push(w);
             }
         }
-
-
     }
 
     void path_builder(int src, int dest, int dist, std::vector<int>& path, std::vector<std::vector<int>>& ret){
@@ -152,18 +178,7 @@ public:
         }
         return ret;
     }
-
-    int extract_max_cap(std::vector<int> path){
-        int cap = INT32_MAX;
-        for(unsigned int i=path.size()-1;i>0;i--){
-            for(auto e : nodes[i].adj){
-                if(e.dest==path[i-1])
-                    cap=std::min(cap, e.weight.capacity);
-            }
-        }
-        return cap;
-    }
 };
 
 
-#endif //DA_PROJECT_GRAPH_PARETO_H
+#endif //DA_PROJECT_PARETOGRAPH_H

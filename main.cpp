@@ -1,6 +1,6 @@
 #include <iostream>
 #include "case1.h"
-#include "graph_pareto.h"
+#include "paretograph.h"
 
 int main() {
     ParetoGraph graph(0);
