@@ -5,13 +5,14 @@
 #include <fstream>
 #include <sstream>
 #include "graph.h"
+#include "graph_pareto.h"
 #include "exception.h"
 #include "utils.h"
 
 
 void case_1_1(Graph& graph) {
     int src, dest;
-    std::cout << "### Case 1.2 ###\n";
+    std::cout << "### Case 1.1 ###\n";
     while (1) {
         std::cout << "Source: ";
         std::cin >> src;
@@ -24,7 +25,7 @@ void case_1_1(Graph& graph) {
         if (dest <= 0 || dest > graph.size()) std::cout << "Invalid dest\n";
         else break;
     }
-    graph.max_flow(src);
+    graph.max_capacity(src);
     std::vector<int> path = graph.path(src, dest);
     std::stringstream s;
     s << '(';
@@ -37,7 +38,8 @@ void case_1_1(Graph& graph) {
     s.clear();
 }
 
-void case_1_2(Graph& graph) {
+void case_1_2() {
+    ParetoGraph graph(TEST_SET_1);
     int src, dest;
     std::cout << "### Case 1.2 ###\n";
     while (1) {
@@ -52,28 +54,20 @@ void case_1_2(Graph& graph) {
         if (dest <= 0 || dest > graph.size()) std::cout << "Invalid dest\n";
         else break;
     }
-    graph.max_flow_min_dist(src);
-    std::vector<int> path = graph.path(src, dest);
-    std::stringstream s;
-    s << '(';
-    for (int i = path.size() - 1; i >= 0; i--) {
-        if (i == 0) s << path[i] << ')';
-        else s << path[i] << ", ";
+
+    graph.pareto_optimal(src);
+    std::vector<std::vector<int>> paths = graph.optimal_paths(src, dest);
+    std::cout << "\n## Paths ##";
+    for(auto v : paths){
+        std::cout << "\n--------------";
+        std::cout << "\nNumber of transitions: " << v.size()-1
+                  << "\nPath: (";
+        for(int i=v.size()-1;i>=0;i--){
+            if(i==0) std::cout << v[i] << ")";
+            else std::cout << v[i] << "->";
+        }
     }
-    std::cout << "Maximum capacity: " << graph.max_node_capacity(dest)
-              << "\nPath: " << s.str() << std::endl;
-    s.str("");
-    s.clear();
-    graph.min_dist_max_flow(src);
-    path=graph.path(src, dest);
-    int cap = graph.extract_max_cap(path);
-    s << '(';
-    for (int i = path.size() - 1; i >= 0; i--) {
-        if (i == 0) s << path[i] << ')';
-        else s << path[i] << ", ";
-    }
-    std::cout << "Shortest path: " << s.str()
-              << "\nCapacity: " << cap << std::endl;
+    std::cout << "\n--------------";
 
 }
 

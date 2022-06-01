@@ -8,7 +8,7 @@
 #include "utils.h"
 #include "graph.h"
 
-void case_2_1(Graph& gaph){
+void case_2_1(Graph& graph){
     int src, dest, size;
     std::cout << "### Case 1.2 ###\n";
     while (1) {
@@ -26,8 +26,11 @@ void case_2_1(Graph& gaph){
     while (1) {
         std::cout << "Group size: ";
         std::cin >> size;
-        if (size <= 0) sd::cout << "Invalid size\n";
+        if (size <= 0) std::cout << "Invalid size\n";
         else break;
+    }
+    while(size > 0){
+
     }
 
 }

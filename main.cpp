@@ -1,15 +1,16 @@
 #include <iostream>
 #include "case1.h"
+#include "graph_pareto.h"
 
 int main() {
-    Graph graph(0);
+    ParetoGraph graph(0);
     try {
-        graph = readFile(TEST_SET_1);
+        graph = ParetoGraph(TEST_SET_1);
     }
     catch (FileNotFound &e) {
         std::cout << e.what();
         return 1;
     }
-    graph.printflow();
+    case_1_2();
     return 0;
 }
