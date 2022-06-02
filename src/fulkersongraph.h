@@ -20,11 +20,6 @@ class FulkersonGraph {
         int capacity; // An integer weight
         bool active;
     };
-    struct ResidualEdge {
-        int src;
-        int flow;
-    };
-
     struct Node {
         int dist;
         int cap;
@@ -65,7 +60,7 @@ public:
         nodes.push_back(node);
     }
 
-    void add_edge(int src, int dest, int capacity = 1, int duration = 1) {
+    void add_edge(int src, int dest, int capacity = 1) {
         if (src < 1 || src > n || dest < 1 || dest > n) return;
         nodes[src].adj.push_back(Edge{dest, capacity, true});
     }
