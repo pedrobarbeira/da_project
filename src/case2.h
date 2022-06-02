@@ -40,16 +40,22 @@ void case_2_1(){
     }
     std::vector<std::pair<int, std::vector<int>>> paths;
     std::pair<int, std::vector<int>> path;
-    while(size > 0){
+    bool flag = false;
+    while (size > 0){
         graph.max_capacity_min_dist(src);
         path = graph.retrieve_path(src, dest);
-        size-=path.first;
+        if(path.second.empty()){
+            flag = true;
+            break;
+        }
+        size -= path.first;
         paths.push_back(path);
     }
     std::cout << "\n## Paths ##";
-    if(paths.empty()){
+    if(flag){
         std::cout << "\n--------------\n"
-                  << "Unfortunately there are no paths\n(you'll have to walk)";
+                  << "Unfortunately there are no paths for your group\n(you'll have to walk)";
+        return;
     }
     else {
         for (auto v: paths) {

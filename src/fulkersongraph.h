@@ -101,6 +101,29 @@ public:
         }
     }
 
+    int max_capacity(int src, int dest){
+        for(int i=1;i<=n;i++){
+            nodes[i].parent = 0;
+            nodes[i].cap = 0;
+        }
+        nodes[src].cap = INT32_MAX;
+        MaxHeap<int, int> maxHeap(n, -1);
+        for(int i = 1; i <= n; i++)
+            maxHeap.insert(i, nodes[i].cap);
+        while(!maxHeap.empty()){
+            int v = maxHeap.removeMax(); //gets node with larger capacity
+            for(auto e : nodes[v].adj){
+                int w = e.dest;
+                if(std::min(nodes[v].cap, e.capacity) > nodes[w].cap){
+                    nodes[w].cap = std::min(nodes[v].cap, e.capacity);
+                    nodes[w].parent=v;
+                    maxHeap.increaseKey(w, nodes[w].cap);
+                }
+            }
+        }
+        return nodes[dest].cap;
+    }
+
     std::pair<int, vector<int>> retrieve_path(int src, int dest){
         std::pair<int, std::vector<int>> ret;
         if(nodes[dest].dist == INT32_MAX) return ret;
@@ -109,7 +132,7 @@ public:
             ret.second.push_back(dest);
             int v = nodes[dest].parent;
             for(auto e : nodes[v].adj)
-                if(e.dest == dest) e.active=false;
+                if(e.dest == dest) e.active=false; //TODO fix this
             dest=v;
         }
         ret.second.push_back(src);
