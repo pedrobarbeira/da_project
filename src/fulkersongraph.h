@@ -48,7 +48,7 @@ public:
         int src, dest, cap, dur;
         while (infile >> src) {
             infile >> dest >> cap >> dur;
-            add_edge(src, dest, cap, dur);
+            add_edge(src, dest, cap);
         }
     }
 

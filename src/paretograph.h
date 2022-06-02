@@ -47,7 +47,7 @@ public:
         int src, dest, cap, dur;
         while (infile >> src) {
             infile >> dest >> cap >> dur;
-            add_edge(src, dest, cap, dur);
+            add_edge(src, dest, cap);
         }
     }
 
@@ -61,7 +61,7 @@ public:
         nodes.push_back(node);
     }
 
-    void add_edge(int src, int dest, int capacity = 1, int duration = 1) {
+    void add_edge(int src, int dest, int capacity = 1) {
         if (src < 1 || src > n || dest < 1 || dest > n) return;
         nodes[src].adj.push_back(Edge{dest, capacity});
     }
