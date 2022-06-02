@@ -70,27 +70,26 @@ public:
         return n;
     }
 
-    void max_capacity_min_dist(int src){
-        for(int i=1;i<=n;i++){
+    void max_capacity_min_dist(int src) {
+        for (int i = 1; i <= n; i++) {
             nodes[i].cpt = 0;
             nodes[i].dist = INT32_MAX;
         }
         nodes[src].cpt = INT32_MAX;
-        nodes[src].dist=0;
+        nodes[src].dist = 0;
         MaxHeap<int, int> maxHeap(n, -1);
-        for(int i = 1; i <= n; i++)
+        for (int i = 1; i <= n; i++)
             maxHeap.insert(i, nodes[i].cpt);
-        while(!maxHeap.empty()){
+        while (!maxHeap.empty()) {
             int v = maxHeap.removeMax(); //gets node with larger capacity
-            for(auto e : nodes[v].adj){
+            for (auto e: nodes[v].adj) {
                 int w = e.dest;
-                if(std::min(nodes[v].cpt, e.capacity) > nodes[w].cpt){
+                if (std::min(nodes[v].cpt, e.capacity) > nodes[w].cpt) {
                     nodes[w].cpt = std::min(nodes[v].cpt, e.capacity);
-                    nodes[w].dist=nodes[v].dist+1;
+                    nodes[w].dist = nodes[v].dist + 1;
                     maxHeap.increaseKey(w, nodes[w].cpt);
-                }
-                else if(std::min(nodes[v].cpt, e.capacity) == nodes[w].cpt
-                        && nodes[v].dist+1 < nodes[w].dist) {
+                } else if (std::min(nodes[v].cpt, e.capacity) == nodes[w].cpt
+                           && nodes[v].dist + 1 < nodes[w].dist) {
                     nodes[w].dist = nodes[v].dist + 1;
                     maxHeap.increaseKey(w, nodes[w].cpt);
                 }

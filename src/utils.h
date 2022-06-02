@@ -18,6 +18,23 @@ static string DATA_SET_8 = "tests/in08.txt";
 static string DATA_SET_9 = "tests/in09.txt";
 static string DATA_SET_10 = "tests/in10.txt";
 
-
+std::string get_fpath(int dataSet){
+    std::string path;
+    switch(dataSet) {
+        case 0: path = TEST_SET_1; break;
+        case 1: path = DATA_SET_1; break;
+        case 2: path = DATA_SET_2; break;
+        case 3: path = DATA_SET_3; break;
+        case 4: path = DATA_SET_4; break;
+        case 5: path = DATA_SET_5; break;
+        case 6: path = DATA_SET_6; break;
+        case 7: path = DATA_SET_7; break;
+        case 8: path = DATA_SET_8; break;
+        case 9: path = DATA_SET_9; break;
+        case 10: path = DATA_SET_10; break;
+        default: path = "";
+    }
+    return path;
+}
 
 #endif //PROJECT2_UTIL_H
