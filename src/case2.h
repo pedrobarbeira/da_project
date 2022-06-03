@@ -12,14 +12,14 @@
 //TODO plug in dataset selection
 
 void case_2_1(){
-    /*int dataSet;
+    int dataSet;
     while (1) {
         std::cout << "Choose Data Set [0-10]: ";
         std::cin >> dataSet;
         if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
         else break;
-    }*/
-    string fpath = TEST_SET_2;
+    }
+    string fpath = get_fpath_2(dataSet);
     FulkersonGraph graph = FulkersonGraph(DATA_SET_2);
     int src, dest, size;
     std::cout << "### Case 2.1 ###\n";
@@ -68,14 +68,14 @@ void case_2_1(){
 }
 
 void case_2_2() {
-    /*int dataSet;
+    int dataSet;
     while (1) {
         std::cout << "Choose Data Set [0-10]: ";
         std::cin >> dataSet;
         if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
         else break;
-    }*/
-    string fpath = TEST_SET_2;
+    }
+    string fpath = get_fpath_2(dataSet);
     FulkersonGraph graph = FulkersonGraph(DATA_SET_2);
     int src, dest, size;
     std::cout << "### Case 2.2 ###\n";
@@ -145,14 +145,14 @@ void case_2_2() {
 
 
 void case_2_3() {
-    /*int dataSet;
+    int dataSet;
     while (1) {
         std::cout << "Choose Data Set [0-10]: ";
         std::cin >> dataSet;
         if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
         else break;
-    }*/
-    string fpath = TEST_SET_2;
+    }
+    string fpath = get_fpath_2(dataSet);
     FulkersonGraph graph = FulkersonGraph(DATA_SET_2);
     int src, dest;
     std::cout << "### Case 2.3 ###\n";

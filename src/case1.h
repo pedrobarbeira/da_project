@@ -46,7 +46,7 @@ void case_1_2() {
         if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
         else break;
     }
-    string fpath = get_fpath(dataSet);
+    string fpath = get_fpath_1(dataSet);
     ParetoGraph graph = ParetoGraph(fpath);
     int src, dest;
     std::cout << "### Case 1.2 ###\n";
