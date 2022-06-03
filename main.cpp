@@ -5,6 +5,6 @@
 
 int main() {
 
-    case_2_1();
+    case_2_2();
     return 0;
 }

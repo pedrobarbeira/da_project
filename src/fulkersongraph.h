@@ -173,7 +173,53 @@ public:
                 paths.push_back(path);
                 flag = false;
                 size -= cap;
-                if(size < 0) return;
+                if(size <= 0) return;
+            }
+            path.second.clear();
+            calculate_residual();
+            gamma_bfs(dest);
+            g.clear();
+        }
+    }
+
+    void ford_fulkerson_increase(int src, int dest, int size, std::vector<std::pair<int, std::vector<int>>>& paths){
+        std::vector<Edge*> g;
+        std::pair<int, std::vector<int>> path;
+        calculate_residual();
+        gamma_bfs(dest);
+        while(path_exists(src, dest, g)){
+            int c = INT32_MAX, cap = INT32_MAX;
+            bool flag = false;
+            path.second.push_back(dest);
+            for(auto e : g) {
+                path.second.push_back(e->dest);
+                c = std::min(c, e->flow);
+                cap = std::min(cap, e->capacity);
+            }
+            int t = dest;
+            while(t!=src){
+                for(auto e : g){
+                    for(auto i : nodes[e->dest].adj){
+                        if(i->dest == t){
+                            i->flow += c;
+                            if(i->flow < e->capacity)
+                                e->flow = e->capacity - i->flow;
+                            else {
+                                e->flow = 0;
+                                e->active = false;
+                                flag = true;
+                            }
+                            t=e->dest;
+                        }
+                    }
+                }
+            }
+            if(flag){
+                path.first = cap;
+                paths.push_back(path);
+                flag = false;
+                size -= cap;
+                if(size <= 0) return;
             }
             path.second.clear();
             calculate_residual();
