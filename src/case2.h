@@ -18,7 +18,7 @@ void case_2_1(){
         else break;
     }*/
     string fpath = TEST_SET_2;
-    FulkersonGraph graph = FulkersonGraph(fpath);
+    FulkersonGraph graph = FulkersonGraph(DATA_SET_2);
     int src, dest, size;
     std::cout << "### Case 2.1 ###\n";
     while (1) {
@@ -40,7 +40,7 @@ void case_2_1(){
         else break;
     }
     std::vector<std::pair<int, std::vector<int>>> paths;
-    graph.ford_fulkerson(src, dest, paths);
+    graph.ford_fulkerson(src, dest, size, paths);
     std::cout << "\n## Paths ##";
     int count = 0;
     for(auto p : paths){

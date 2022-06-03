@@ -83,13 +83,16 @@ public:
         while(!q.empty()){
             v = q.front();
             q.pop();
+            Edge* maxEdge = new Edge{0, 0, 0, true};
             for(auto e : nodes[v].residual){
                 if(e->active) {
                     w = e->dest;
-                    nodes[v].parent = w;
+                    if(e->flow > maxEdge->flow)
+                        maxEdge = e;
                     q.push(w);
                 }
             }
+            nodes[v].parent = maxEdge->dest;
         }
     }
 
@@ -99,10 +102,10 @@ public:
             for(auto e : nodes[i].residual){
                 if(e->active) {
                     v = e->dest;
-                }
-                for(auto j : nodes[v].adj){
+                for(auto j : nodes[v].adj) {
                     w = j->dest;
-                    if(v == w) e->flow=j->capacity - j->flow;
+                    if (v == w) e->flow = j->capacity - j->flow;
+                }
                 }
             }
 
@@ -115,15 +118,17 @@ public:
                 return false;
             else{
                 for(auto e : nodes[dest].residual)
-                    if(e->dest == nodes[dest].parent)
+                    if(e->dest == nodes[dest].parent) {
                         g.push_back(e);
+                        break;
+                    }
                 dest = nodes[dest].parent;
             }
         }
         return true;
     }
 
-    void ford_fulkerson(int src, int dest, std::vector<std::pair<int, std::vector<int>>>& paths){
+    void ford_fulkerson(int src, int dest, int size, std::vector<std::pair<int, std::vector<int>>>& paths){
         for(auto n : nodes){
             for(auto e : n.adj){
                 e->flow=1;
@@ -167,6 +172,8 @@ public:
                 path.first = cap;
                 paths.push_back(path);
                 flag = false;
+                size -= cap;
+                if(size < 0) return;
             }
             path.second.clear();
             calculate_residual();
