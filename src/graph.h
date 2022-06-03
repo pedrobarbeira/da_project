@@ -99,10 +99,8 @@ public:
 
     std::vector<int>path(int src, int dest){
         std::vector<int> ret;
-        if(nodes[dest].cap == 0){
-            std::cout << "No path from " << src << " to " << dest << '\n';
+        if(nodes[dest].cap == 0)
             return ret;
-        }
         while(dest != src){
             ret.push_back(dest);
             dest=nodes[dest].parent;

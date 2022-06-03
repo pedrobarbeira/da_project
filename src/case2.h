@@ -6,20 +6,21 @@
 #define DA_PROJECT_CASE2_H
 
 #include "utils.h"
+#include "graph.h"
 #include "fulkersongraph.h"
 
 void case_2_1(){
-    int dataSet;
+    /*int dataSet;
     while (1) {
         std::cout << "Choose Data Set [0-10]: ";
         std::cin >> dataSet;
         if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
         else break;
-    }
-    string fpath = get_fpath(dataSet);
+    }*/
+    string fpath = TEST_SET_2;
     FulkersonGraph graph = FulkersonGraph(fpath);
     int src, dest, size;
-    std::cout << "### Case 1.2 ###\n";
+    std::cout << "### Case 2.1 ###\n";
     while (1) {
         std::cout << "Source: ";
         std::cin >> src;
@@ -39,20 +40,13 @@ void case_2_1(){
         else break;
     }
     std::vector<std::pair<int, std::vector<int>>> paths;
-    std::pair<int, std::vector<int>> path;
-    bool flag = false;
-    while (size > 0){
-        graph.max_capacity_min_dist(src);
-        path = graph.retrieve_path(src, dest);
-        if(path.second.empty()){
-            flag = true;
-            break;
-        }
-        size -= path.first;
-        paths.push_back(path);
-    }
+    graph.ford_fulkerson(src, dest, paths);
     std::cout << "\n## Paths ##";
-    if(flag){
+    int count = 0;
+    for(auto p : paths){
+        count += p.first;
+    }
+    if(count < size){
         std::cout << "\n--------------\n"
                   << "Unfortunately there are no paths for your group\n(you'll have to walk)";
         return;

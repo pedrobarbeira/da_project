@@ -17,6 +17,7 @@
 class FulkersonGraph {
     struct Edge {
         int dest;   // Destination node
+        int flow;
         int capacity; // An integer weight
         bool active;
     };
@@ -24,9 +25,9 @@ class FulkersonGraph {
         int dist;
         int cap;
         int parent;
-        list<Edge>adj;
+        list<Edge*>adj;
+        list<Edge*> residual;
     };
-
     int n;              // Graph size (vertices are numbered from 1 to n)
     std::vector<Node> nodes; // The list of nodes being represented
 public:
@@ -62,81 +63,116 @@ public:
 
     void add_edge(int src, int dest, int capacity = 1) {
         if (src < 1 || src > n || dest < 1 || dest > n) return;
-        nodes[src].adj.push_back(Edge{dest, capacity, true});
+        nodes[src].adj.push_back(new Edge{dest, 0, capacity, true});
+        nodes[dest].residual.push_back(new Edge{src, 0, capacity, true});
     }
 
     int size() const{
         return n;
     }
 
-    void max_capacity_min_dist(int src){
+    void gamma_bfs(int src){
         for(int i=1;i<=n;i++){
             nodes[i].parent = 0;
-            nodes[i].cap = 0;
-            nodes[i].dist = INT32_MAX;
+            nodes[i].cap=0;
         }
-        nodes[src].cap = INT32_MAX;
-        nodes[src].dist=0;
-        MaxHeap<int, int> maxHeap(n, -1);
-        for(int i = 1; i <= n; i++)
-            maxHeap.insert(i, nodes[i].cap);
-        while(!maxHeap.empty()){
-            int v = maxHeap.removeMax(); //gets node with larger capacity
-            for(auto e : nodes[v].adj) {
-                if (e.active) {
-                    int w = e.dest;
-                    if (std::min(nodes[v].cap, e.capacity) > nodes[w].cap) {
-                        nodes[w].parent = v;
-                        nodes[w].cap = std::min(nodes[v].cap, e.capacity);
-                        nodes[w].dist = nodes[v].dist + 1;
-                        maxHeap.increaseKey(w, nodes[w].cap);
-                    } else if (std::min(nodes[v].cap, e.capacity) == nodes[w].cap
-                               && nodes[v].dist + 1 < nodes[w].dist) {
-                        nodes[w].parent=v;
-                        nodes[w].dist = nodes[v].dist + 1;
-                        maxHeap.increaseKey(w, nodes[w].cap);
+        std::queue<int> q;
+        nodes[src].cap=INT32_MAX;
+        q.push(src);
+        int v, w;
+        while(!q.empty()){
+            v = q.front();
+            q.pop();
+            for(auto e : nodes[v].residual){
+                if(e->active) {
+                    w = e->dest;
+                    nodes[v].parent = w;
+                    q.push(w);
+                }
+            }
+        }
+    }
+
+    void calculate_residual(){
+        int v, w;
+        for(int i=1;i<=n;i++){
+            for(auto e : nodes[i].residual){
+                if(e->active) {
+                    v = e->dest;
+                }
+                for(auto j : nodes[v].adj){
+                    w = j->dest;
+                    if(v == w) e->flow=j->capacity - j->flow;
+                }
+            }
+
+        }
+    }
+
+    bool path_exists(int src, int dest, std::vector<Edge*>& g){
+        while(dest != src){
+            if (nodes[dest].parent == 0)
+                return false;
+            else{
+                for(auto e : nodes[dest].residual)
+                    if(e->dest == nodes[dest].parent)
+                        g.push_back(e);
+                dest = nodes[dest].parent;
+            }
+        }
+        return true;
+    }
+
+    void ford_fulkerson(int src, int dest, std::vector<std::pair<int, std::vector<int>>>& paths){
+        for(auto n : nodes){
+            for(auto e : n.adj){
+                e->flow=1;
+            }
+            for(auto e : n.residual){
+                e->flow=1;
+            }
+        }
+        std::vector<Edge*> g;
+        std::pair<int, std::vector<int>> path;
+        calculate_residual();
+        gamma_bfs(dest);
+        while(path_exists(src, dest, g)){
+            int c = INT32_MAX, cap = INT32_MAX;
+            bool flag = false;
+            path.second.push_back(dest);
+            for(auto e : g) {
+                path.second.push_back(e->dest);
+                c = std::min(c, e->flow);
+                cap = std::min(cap, e->capacity);
+            }
+            int t = dest;
+            while(t!=src){
+                for(auto e : g){
+                    for(auto i : nodes[e->dest].adj){
+                        if(i->dest == t){
+                            i->flow += c;
+                            if(i->flow < e->capacity)
+                                e->flow = e->capacity - i->flow;
+                            else {
+                                e->flow = 0;
+                                e->active = false;
+                                flag = true;
+                            }
+                            t=e->dest;
+                        }
                     }
                 }
             }
-        }
-    }
-
-    int max_capacity(int src, int dest){
-        for(int i=1;i<=n;i++){
-            nodes[i].parent = 0;
-            nodes[i].cap = 0;
-        }
-        nodes[src].cap = INT32_MAX;
-        MaxHeap<int, int> maxHeap(n, -1);
-        for(int i = 1; i <= n; i++)
-            maxHeap.insert(i, nodes[i].cap);
-        while(!maxHeap.empty()){
-            int v = maxHeap.removeMax(); //gets node with larger capacity
-            for(auto e : nodes[v].adj){
-                int w = e.dest;
-                if(std::min(nodes[v].cap, e.capacity) > nodes[w].cap){
-                    nodes[w].cap = std::min(nodes[v].cap, e.capacity);
-                    nodes[w].parent=v;
-                    maxHeap.increaseKey(w, nodes[w].cap);
-                }
+            if(flag){
+                path.first = cap;
+                paths.push_back(path);
+                flag = false;
             }
+            path.second.clear();
+            calculate_residual();
+            gamma_bfs(dest);
+            g.clear();
         }
-        return nodes[dest].cap;
-    }
-
-    std::pair<int, vector<int>> retrieve_path(int src, int dest){
-        std::pair<int, std::vector<int>> ret;
-        if(nodes[dest].dist == INT32_MAX) return ret;
-        ret.first = nodes[dest].cap;
-        while(src!=dest){
-            ret.second.push_back(dest);
-            int v = nodes[dest].parent;
-            for(auto e : nodes[v].adj)
-                if(e.dest == dest) e.active=false; //TODO fix this
-            dest=v;
-        }
-        ret.second.push_back(src);
-        return ret;
     }
 
 };
