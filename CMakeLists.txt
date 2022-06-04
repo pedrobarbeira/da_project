@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.19)
 project(da_project)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 
 include_directories(src)
 
@@ -16,4 +16,5 @@ add_executable(da_project
         src/case2.h
         src/paretograph.h
         src/fulkersongraph.h
-        src/testfulkerson.h)
+        src/testfulkerson.h
+        src/caseJ.h)
