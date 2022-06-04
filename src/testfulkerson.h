@@ -291,7 +291,7 @@ public:
 
     double findMinResidualAlongPath(int s, int t) { //Starts from the end and goes to the beginning in order to find the maxFlow
 
-        int f = INT_MAX;
+        int f = INT32_MAX;
         int curV = t;
         list<int> pathList = {};
 

@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "graph.h"
 #include "fulkersongraph.h"
+#include "timegraph.h"
 #include "algorithm"
 
 //TODO plug in dataset selection
@@ -63,6 +64,7 @@ void case_2() {
                   << "\n--------------\n";
         return;
     }
+    TimeGraph time = TimeGraph(graph.size());
     bool flag = true;
     int count = 0;
     while (1) {
@@ -75,16 +77,29 @@ void case_2() {
                 std::cout << "\n--------------"
                           << "\nCapacity: " << (*it)->capacity
                           << "\nPath: (";
+                int v = src;
                 for (int i = (*it)->path.size() - 1; i >= 0; i--) {
-                    if (i == 0) std::cout << (*it)->path[i].second << ")";
-                    else std::cout << (*it)->path[i].second << "->";
+                    int n = (*it)->path[i].second;
+                    if(n!=src) time.add_edge(v, n, (*it)->path[i].first);
+                    v=n;
+                    if (i == 0) std::cout << n << ")";
+                    else std::cout << n << "->";
                 }
                 maxTime=std::max(maxTime, (*it)->duration);
                 minTime=std::min(minTime, (*it)->duration);
             }
+            time.longest_time(src);
+            std::vector<std::pair<int, int>> times;
+            times = time.get_times(src);
+            std::cout << "\nWaiting times:";
+            for(auto t : times){
+                if(t.second != 0){
+                    std::cout << "\n" << t.second << " minutes in stop " << t.first;
+                }
+            }
             std::cout << "\n--------------"
-                      << "\nYou'll have to wait " << maxTime - minTime << " minutes\n"
-                      << "to meet each other in your destination"
+                      << "\nYou'll have to wait " << time.final_time(dest) << " minutes to\n"
+                      << "meet each other in your destination"
                       << "\n--------------";
             count = temp;
             flag = false;

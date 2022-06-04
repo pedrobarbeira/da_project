@@ -16,5 +16,6 @@ add_executable(da_project
         src/case2.h
         src/paretograph.h
         src/fulkersongraph.h
+        src/timegraph.h
         src/testfulkerson.h
         src/caseJ.h)
