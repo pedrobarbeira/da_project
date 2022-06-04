@@ -7,7 +7,7 @@
 #include "graph.h"
 
 string TEST_SET_1 = "tests/test01.txt";
-string TEST_SET_2 = "tests/test02.txt";
+string TEST_SET_2 = "tests/test03";
 string DATA_SET_1 = "tests/in01.txt";
 string DATA_SET_2 = "tests/in02.txt";
 string DATA_SET_3 = "tests/in03.txt";
@@ -16,8 +16,8 @@ string DATA_SET_5 = "tests/in05.txt";
 string DATA_SET_6 = "tests/in06.txt";
 string DATA_SET_7 = "tests/in07.txt";
 string DATA_SET_8 = "tests/in08.txt";
-string DATA_SET_9 = "tests/in09.txt";
-string DATA_SET_10 = "tests/in10.txt";
+string DATA_SET_9 = "tests/in09_b.txt";
+string DATA_SET_10 = "tests/in10_b.txt";
 
 std::string get_fpath_1(int dataSet){
     std::string path;

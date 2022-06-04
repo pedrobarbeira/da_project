@@ -12,22 +12,24 @@
 
 //TODO plug in dataset selection
 
-bool most_capacity(std::pair<int, std::vector<int>> a, std::pair<int, std::vector<int>> b){
-    return a.first > b.first;
+
+
+bool shorter_time(Path* a, Path* b){
+    return a->duration < b->duration;
 }
 
 void case_2() {
-    //int dataSet;
-    //while (1) {
-     //   std::cout << "Choose Data Set [0-10]: ";
-      //  std::cin >> dataSet;
-    //    if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
-    //    else break;
-    //}
-    //string fpath = get_fpath_2(dataSet);
-    FulkersonGraph graph = FulkersonGraph("tests/test03");
+    int dataSet;
+    while (1) {
+        std::cout << "Choose Data Set [0-10]: ";
+        std::cin >> dataSet;
+        if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
+        else break;
+    }
+    string fpath = get_fpath_2(dataSet);
+    FulkersonGraph graph = FulkersonGraph(fpath);
     int src, dest, size;
-    std::cout << "### Case 2.2 ###\n";
+    std::cout << "### Case 2 ###\n";
     while (1) {
         std::cout << "Source: ";
         std::cin >> src;
@@ -46,14 +48,13 @@ void case_2() {
         if (size <= 0) std::cout << "Invalid size\n";
         else break;
     }
-    std::vector<std::pair<int, std::vector<int>>> paths;
-    graph.reset_graph();
+    std::vector<Path*> paths;
     graph.ford_fulkerson(src, dest);
-    paths = graph.extract_paths(src, dest);
-    sort(paths.begin(), paths.end(), most_capacity);
+    paths = graph.get_paths();
+    std::vector<int> totalTimes;
     int maxCount = 0;
     for (auto p: paths) {
-        maxCount += p.first;
+        maxCount += p->capacity;
     }
     std::cout << "\nMax Network Capacity: " << maxCount;
     if (maxCount < size) {
@@ -65,20 +66,26 @@ void case_2() {
     bool flag = true;
     int count = 0;
     while (1) {
-        std::vector<std::pair<int, std::vector<int>>>::const_iterator it;
+        std::vector<Path*>::const_iterator it;
         if (flag) {
             std::cout << "\n## Paths ##";
-            int temp = 0;
+            int temp = 0, maxTime=0, minTime=INT32_MAX;
             for (it = paths.begin(); temp < size; it++) {
-                temp += it->first;
+                temp += (*it)->capacity;
                 std::cout << "\n--------------"
-                          << "\nCapacity: " << it->first
+                          << "\nCapacity: " << (*it)->capacity
                           << "\nPath: (";
-                for (int i = it->second.size() - 1; i >= 0; i--) {
-                    if (i == 0) std::cout << it->second[i] << ")";
-                    else std::cout << it->second[i] << "->";
+                for (int i = (*it)->path.size() - 1; i >= 0; i--) {
+                    if (i == 0) std::cout << (*it)->path[i].second << ")";
+                    else std::cout << (*it)->path[i].second << "->";
                 }
+                maxTime=std::max(maxTime, (*it)->duration);
+                minTime=std::min(minTime, (*it)->duration);
             }
+            std::cout << "\n--------------"
+                      << "\nYou'll have to wait " << maxTime - minTime << " minutes\n"
+                      << "to meet each other in your destination"
+                      << "\n--------------";
             count = temp;
             flag = false;
         }
