@@ -10,9 +10,18 @@
 #include "utils.h"
 
 
-void case_1_1(Graph& graph) {
-    int src, dest;
+void case_1_1() {
     std::cout << "### Case 1.1 ###\n";
+    int dataSet;
+    while (1) {
+        std::cout << "Choose Data Set [0-10]: ";
+        std::cin >> dataSet;
+        if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
+        else break;
+    }
+    string fpath = get_fpath_1(dataSet);
+    Graph graph = Graph(fpath);
+    int src, dest;
     while (1) {
         std::cout << "Source: ";
         std::cin >> src;
@@ -31,7 +40,7 @@ void case_1_1(Graph& graph) {
     s << '(';
     for (int i = path.size() - 1; i >= 0; i--) {
         if (i == 0) s << path[i] << ')';
-        else s << path[i] << ", ";
+        else s << path[i] << "->";
     }
     std::cout << "Maximum capacity: " << graph.max_node_capacity(dest)
               << "\nPath: " << s.str() << std::endl;

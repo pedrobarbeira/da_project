@@ -15,19 +15,25 @@
 #include "minHeap.h"
 
 class FulkersonGraph {
+    struct Weight{
+        int capacity;
+        int duration;
+    };
     struct Edge {
         int dest;   // Destination node
         int flow;
-        int capacity; // An integer weight
+        Weight* weight; // An integer weight
         bool active;
     };
     struct Node {
-        int dist;
         int cap;
         int parent;
+        Edge* parentEdge;
+        list<Edge*> parents;
         list<Edge*>adj;
         list<Edge*> residual;
     };
+    FulkersonGraph* paths;
     int n;              // Graph size (vertices are numbered from 1 to n)
     std::vector<Node> nodes; // The list of nodes being represented
 public:
@@ -37,6 +43,7 @@ public:
         for (int i = 0; i <= size; i++) {
             add_node(i);
         }
+        paths = nullptr;
     }
 
     explicit FulkersonGraph(std::string path) {
@@ -49,185 +56,148 @@ public:
         int src, dest, cap, dur;
         while (infile >> src) {
             infile >> dest >> cap >> dur;
-            add_edge(src, dest, cap);
+            add_edge(src, dest, cap, dur);
         }
     }
 
     void add_node(int val) {
         if (nodes.size() == n + 1) return;
         Node node;
-        node.dist=0;
+        node.parent=0;
         node.adj.clear();
         nodes.push_back(node);
     }
 
-    void add_edge(int src, int dest, int capacity = 1) {
+    void add_edge(int src, int dest, int capacity, int duration) {
         if (src < 1 || src > n || dest < 1 || dest > n) return;
-        nodes[src].adj.push_back(new Edge{dest, 0, capacity, true});
-        nodes[dest].residual.push_back(new Edge{src, 0, capacity, true});
+        nodes[src].adj.push_back(new Edge{dest, 0, new Weight{capacity, duration}, true});
+        nodes[dest].residual.push_back(new Edge{src, 0, new Weight{capacity, duration}, true});
+    }
+
+    void add_edge(int src, int dest, Weight* w){
+        if (src < 1 || src > n || dest < 1 || dest > n) return;
+        nodes[src].adj.push_back(new Edge{dest, 0, w, true});
+    }
+
+    void add_edge(int src, Edge* e){
+        nodes[e->dest].adj.push_back(new Edge{src, 0, e->weight, true});
     }
 
     int size() const{
         return n;
     }
 
-    void gamma_bfs(int src){
+    void reset_graph(){
         for(int i=1;i<=n;i++){
-            nodes[i].parent = 0;
+            nodes[i].parent =0;
+            nodes[i].parentEdge=nullptr;
             nodes[i].cap=0;
+            for(auto e: nodes[i].adj){
+                e->flow=0;
+                e->active=true;
+            }
+            for(auto e: nodes[i].residual){
+                e->flow=0;
+                e->active=true;
+            }
         }
-        std::queue<int> q;
-        nodes[src].cap=INT32_MAX;
-        q.push(src);
-        int v, w;
+    }
+
+    void residual_network(){
+        for(int i=1;i<=n;i++){
+            for(auto e : nodes[i].adj){
+                for(auto j: nodes[e->dest].residual){
+                    if(j->dest==i){
+                        j->flow = e->weight->capacity - e->flow;
+                        if(j->flow <= 0)
+                            j->active = false;
+                    }
+                }
+            }
+        }
+    }
+
+    bool augmenting_path(int src, int dest){
+        std::stack<int> q;
+        nodes[dest].cap=INT32_MAX;
+        q.push(dest);
         while(!q.empty()){
-            v = q.front();
+            int v = q.top();
             q.pop();
-            Edge* maxEdge = new Edge{0, 0, 0, true};
-            for(auto e : nodes[v].residual){
-                if(e->active) {
-                    w = e->dest;
-                    if(e->flow > maxEdge->flow)
-                        maxEdge = e;
+            for(auto e : nodes[v].residual) {
+                if (e->active) {
+                    int w = e->dest;
+                    nodes[w].cap = std::min(nodes[v].cap, e->flow);
+                    nodes[v].parentEdge = e;
+                    if (w == src) return true;
                     q.push(w);
                 }
             }
-            nodes[v].parent = maxEdge->dest;
         }
+        return false;
     }
 
-    void calculate_residual(){
-        int v, w;
-        for(int i=1;i<=n;i++){
-            for(auto e : nodes[i].residual){
-                if(e->active) {
-                    v = e->dest;
-                for(auto j : nodes[v].adj) {
-                    w = j->dest;
-                    if (v == w) e->flow = j->capacity - j->flow;
-                }
-                }
+    void ford_fulkerson(int src, int dest){
+        if(paths == nullptr)
+            paths = new FulkersonGraph(n);
+        residual_network();
+        std::vector<Edge*> g;
+        while(augmenting_path(src, dest)){
+            int v = dest;
+            do{
+                g.push_back(nodes[v].parentEdge);
+                v = nodes[v].parentEdge->dest;
+            }while(v != src);
+            int c = INT32_MAX;
+            for(auto e : g){
+                c = std::min(c, e->flow);
             }
-
-        }
-    }
-
-    bool path_exists(int src, int dest, std::vector<Edge*>& g){
-        while(dest != src){
-            if (nodes[dest].parent == 0)
-                return false;
-            else{
-                for(auto e : nodes[dest].residual)
-                    if(e->dest == nodes[dest].parent) {
-                        g.push_back(e);
+            v=dest;
+            for(auto e : g){
+                e->flow -= c;
+                for(auto i : nodes[e->dest].adj){
+                    if(i->dest == v) {
+                        i->flow += c;
+                        e->flow = i->weight->capacity - i->flow;
+                        if(e->flow <= 0)
+                            e->active = false;
                         break;
                     }
-                dest = nodes[dest].parent;
-            }
-        }
-        return true;
-    }
-
-    void ford_fulkerson(int src, int dest, int size, std::vector<std::pair<int, std::vector<int>>>& paths){
-        for(auto n : nodes){
-            for(auto e : n.adj){
-                e->flow=1;
-            }
-            for(auto e : n.residual){
-                e->flow=1;
-            }
-        }
-        std::vector<Edge*> g;
-        std::pair<int, std::vector<int>> path;
-        calculate_residual();
-        gamma_bfs(dest);
-        while(path_exists(src, dest, g)){
-            int c = INT32_MAX, cap = INT32_MAX;
-            bool flag = false;
-            path.second.push_back(dest);
-            for(auto e : g) {
-                path.second.push_back(e->dest);
-                c = std::min(c, e->flow);
-                cap = std::min(cap, e->capacity);
-            }
-            int t = dest;
-            while(t!=src){
-                for(auto e : g){
-                    for(auto i : nodes[e->dest].adj){
-                        if(i->dest == t){
-                            i->flow += c;
-                            if(i->flow < e->capacity)
-                                e->flow = e->capacity - i->flow;
-                            else {
-                                e->flow = 0;
-                                e->active = false;
-                                flag = true;
-                            }
-                            t=e->dest;
-                        }
-                    }
                 }
+                bool flag=false;
+                for(auto j : nodes[v].parents){
+                    if(j == e) flag = true;
+                    break;
+                }
+                if(!flag) nodes[v].parents.push_back(e);
+                v=e->dest;
             }
-            if(flag){
-                path.first = cap;
-                paths.push_back(path);
-                flag = false;
-                size -= cap;
-                if(size <= 0) return;
-            }
-            path.second.clear();
-            calculate_residual();
-            gamma_bfs(dest);
             g.clear();
         }
     }
 
-    void ford_fulkerson_increase(int src, int dest, int size, std::vector<std::pair<int, std::vector<int>>>& paths){
-        std::vector<Edge*> g;
-        std::pair<int, std::vector<int>> path;
-        calculate_residual();
-        gamma_bfs(dest);
-        while(path_exists(src, dest, g)){
-            int c = INT32_MAX, cap = INT32_MAX;
-            bool flag = false;
-            path.second.push_back(dest);
-            for(auto e : g) {
-                path.second.push_back(e->dest);
-                c = std::min(c, e->flow);
-                cap = std::min(cap, e->capacity);
-            }
-            int t = dest;
-            while(t!=src){
-                for(auto e : g){
-                    for(auto i : nodes[e->dest].adj){
-                        if(i->dest == t){
-                            i->flow += c;
-                            if(i->flow < e->capacity)
-                                e->flow = e->capacity - i->flow;
-                            else {
-                                e->flow = 0;
-                                e->active = false;
-                                flag = true;
-                            }
-                            t=e->dest;
-                        }
-                    }
-                }
-            }
-            if(flag){
-                path.first = cap;
-                paths.push_back(path);
-                flag = false;
-                size -= cap;
-                if(size <= 0) return;
-            }
-            path.second.clear();
-            calculate_residual();
-            gamma_bfs(dest);
-            g.clear();
+    void path_builder(int src, int dest, Edge* e, std::pair<int, std::vector<int>> path, std::vector<std::pair<int, std::vector<int>>> &v) {
+        std::pair<int, std::vector<int>> root = path;
+        root.first = std::min(root.first, e->weight->capacity);
+        dest = e->dest;
+        root.second.push_back(dest);
+        if (dest == src) v.push_back(root);
+        else {
+            for (auto j: nodes[e->dest].parents)
+                path_builder(src, e->dest, j, root, v);
         }
     }
 
+    std::vector<std::pair<int, std::vector<int>>> extract_paths(int src, int dest){
+        std::vector<std::pair<int, std::vector<int>>> v;
+        std::pair<int, std::vector<int>> path;
+        path.second.push_back(dest);
+        for(auto e : nodes[dest].parents){
+            path.first = e->weight->capacity;
+            path_builder(src, dest, e, path, v);
+        }
+        return v;
+    }
 };
 
 #endif //DA_PROJECT_GRAPH_FORD_FULKERSON_H

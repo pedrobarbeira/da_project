@@ -120,11 +120,9 @@ public:
         }
         nodes[src]->dist=0;
         nodes[dest]->cap[max_dist] = max_cap;
-        for(auto e : nodes[src]->adj) {
-            std:: cout << e->dest << std::endl;
+        for(auto e : nodes[src]->adj)
             pareto_recursive(src, e, dest, max_dist);
         }
-    }
 
     void pareto_recursive(int v, Edge* edge, const int& dest, const int& max_dist) {
         int w = edge->dest;
@@ -147,9 +145,7 @@ public:
             return;
         }
         for (auto e: nodes[w]->adj)
-            if (e->active) {
                 pareto_recursive(w, e, dest, max_dist);
-            }
     }
 
     void path_builder(int src, int dest, int dist, std::pair<int, std::vector<int>>& path, std::vector<std::pair<int, std::vector<int>>>& ret){
