@@ -54,7 +54,6 @@ public:
     void add_node(int val){
         if(nodes.size() == n+1) return;
         Node node;
-        node.visited = false;
         node.adj.clear();
         nodes.push_back(node);
     }
