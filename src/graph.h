@@ -22,9 +22,7 @@ class Graph {
 
     struct Node {
         int parent;
-        int parents;
-        bool visited;
-        int cap, dist;
+        int cap;
         std::list<Edge> adj; // The list of outgoing edges (to adjacent nodes)
     };
 
