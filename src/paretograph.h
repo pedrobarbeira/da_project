@@ -20,17 +20,16 @@ class ParetoGraph {
     struct Edge {
         int dest;   // Destination node
         int capacity; // An integer weight
-        bool active;
     };
 
     struct Node {
         int dist, cpt;
-        colors color;
         std::vector<std::vector<int>> parents;
         std::vector<int> cap;
         std::list<Edge*> adj; // The list of outgoing edges (to adjacent nodes)
     };
     int n;              // Graph size (vertices are numbered from 1 to n)
+    int min_cap;
     std::vector<Node*> nodes; // The list of nodes being represented
 
 public:
@@ -87,7 +86,6 @@ public:
         while (!maxHeap.empty()) {
             int v = maxHeap.removeMax(); //gets node with larger capacity
             for (auto e: nodes[v]->adj) {
-                e->active = true;
                 int w = e->dest;
                 if (std::min(nodes[v]->cpt, e->capacity) > nodes[w]->cpt) {
                     nodes[w]->cpt = std::min(nodes[v]->cpt, e->capacity);
@@ -102,11 +100,40 @@ public:
         }
     }
 
+    void min_dist_max_capacity(int src, int dest){
+        for(int i=1;i<=n;i++){
+            nodes[i]->dist = INT32_MAX;
+            nodes[i]->cpt = 0;
+        }
+        nodes[src]->dist=0;
+        nodes[src]->cpt = INT32_MAX;
+        std::queue<int> q;
+        q.push(src);
+        while(!q.empty()){
+            int v = q.front();
+            q.pop();
+            for(auto e : nodes[v]->adj) {
+                int w = e->dest;
+                if (nodes[v]->dist + 1 < nodes[w]->dist) {
+                    nodes[w]->dist = nodes[v]->dist + 1;
+                    nodes[w]->cpt = std::min(nodes[v]->cpt, e->capacity);
+                    q.push(w);
+                } else if (nodes[v]->dist + 1 == nodes[w]->dist
+                           && std::min(nodes[v]->cpt, e->capacity) > nodes[w]->cpt) {
+                    nodes[w]->cpt = std::min(nodes[v]->cpt, e->capacity);
+                    q.push(w);
+                }
+            }
+        }
+        min_cap = nodes[dest]->cpt;
+    }
+
     void pareto_optimal(int src, int dest){
         max_capacity_min_dist(src);
         if(nodes[dest]->dist==INT32_MAX) return;
         int max_dist=nodes[dest]->dist;
         int max_cap=nodes[dest]->cpt;
+        min_dist_max_capacity(src, dest);
         for(int i=1;i<=n;i++){
             nodes[i]->parents.clear();
             nodes[i]->dist=0;
@@ -152,7 +179,8 @@ public:
             return;
         }
         for (auto e: nodes[w]->adj)
-            pareto_recursive(w, e, dest, max_dist);
+            if(e->capacity >= min_cap)
+                pareto_recursive(w, e, dest, max_dist);
     }
 
     void path_builder(int src, int dest, int dist, std::pair<int, std::vector<int>>& path, std::vector<std::pair<int, std::vector<int>>>& ret){
