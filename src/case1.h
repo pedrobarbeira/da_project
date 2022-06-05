@@ -15,7 +15,7 @@ void case_1_2();
 void case_1(){
     int opt;
     while(1) {
-        std::cout << "[1] Line 1\n[2] Line 2\n\n[0] Exit\n";
+        std::cout << "[1] Line 1\n[2] Line 2\n\n[0] Exit\n$";
         std::cin >> opt;
         switch(opt){
             case 0: return;
