@@ -122,7 +122,7 @@ public:
         nodes[dest]->cap[max_dist] = max_cap;
         for(auto e : nodes[src]->adj)
             pareto_recursive(src, e, dest, max_dist);
-        }
+    }
 
     void pareto_recursive(int v, Edge* edge, const int& dest, const int& max_dist) {
         int w = edge->dest;
@@ -133,19 +133,26 @@ public:
             return;
         }
         if (nodes[w]->parents[i].empty()) {
-            nodes[w]->cap[i] = nodes[v]->cpt;
             nodes[w]->parents[i].push_back(v);
-        } else if (nodes[w]->cap[i] < nodes[w]->cpt) {
-            nodes[w]->cap[i] = nodes[w]->cpt;
-            nodes[w]->parents[i].clear();
-            nodes[w]->parents[i].push_back(v);
-        } else if (nodes[w]->cap[i] == nodes[w]->cpt)
-            nodes[w]->parents[i].push_back(v);
+        } else if (nodes[w]->cap[i] <= nodes[w]->cpt) {
+            if (nodes[w]->cap[i] < nodes[w]->cpt) {
+                nodes[w]->cap[i] = nodes[w]->cpt;
+                nodes[w]->parents[i].clear();
+            }
+            bool flag = true;
+            for(auto  x : nodes[w]->parents[i]){
+                if(x == v){
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag) nodes[w]->parents[i].push_back(v);
+        }
         if (w == dest || i == max_dist) {
             return;
         }
         for (auto e: nodes[w]->adj)
-                pareto_recursive(w, e, dest, max_dist);
+            pareto_recursive(w, e, dest, max_dist);
     }
 
     void path_builder(int src, int dest, int dist, std::pair<int, std::vector<int>>& path, std::vector<std::pair<int, std::vector<int>>>& ret){
@@ -164,15 +171,16 @@ public:
         if(nodes[dest]->parents.empty()) return ret;
         std::pair<int, std::vector<int>> path;
         path.second.push_back(dest);
+        int prevCap = 0;
         for(int i=0;i<nodes[dest]->parents.size();i++){
-            if(!nodes[dest]->parents[i].empty()){
+            if(nodes[dest]->cap[i] > prevCap && !nodes[dest]->parents[i].empty()){
                 path.first = nodes[dest]->cap[i];
                 path_builder(src, dest, i, path, ret);
             }
+            prevCap = nodes[dest]->cap[i];
         }
         return ret;
     }
 };
 
-
-#endif //DA_PROJECT_PARETOGRAPH_H
+#endif

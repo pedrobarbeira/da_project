@@ -126,49 +126,4 @@ void case_2() {
     std::cout << "\n--------------";
 }
 
-
-void case_2_3() {
-    int dataSet;
-    while (1) {
-        std::cout << "Choose Data Set [0-10]: ";
-        std::cin >> dataSet;
-        if (dataSet < 0 || dataSet > 10) std::cout << "Invalid Data Set\n";
-        else break;
-    }
-    string fpath = get_fpath_2(dataSet);
-    FulkersonGraph graph = FulkersonGraph(DATA_SET_2);
-    int src, dest;
-    std::cout << "### Case 2.3 ###\n";
-    while (1) {
-        std::cout << "Source: ";
-        std::cin >> src;
-        if (src <= 0 || src > graph.size()) std::cout << "Invalid source\n";
-        else break;
-    }
-    while (1) {
-        std::cout << "Dest: ";
-        std::cin >> dest;
-        if (dest <= 0 || dest > graph.size()) std::cout << "Invalid dest\n";
-        else break;
-    }
-    std::vector<std::pair<int, std::vector<int>>> paths;
-    //graph.ford_fulkerson(src, dest, INT32_MAX, paths);
-    std::cout << "\n## Paths ##";
-    int count = 0;
-    for (auto p: paths) {
-        count += p.first;
-    }
-    std::cout << "\nTotal capacity: " << count;
-    for (auto v: paths) {
-        std::cout << "\n--------------"
-                  << "\nCapacity: " << v.first
-                  << "\nPath: (";
-        for (int i = v.second.size() - 1; i >= 0; i--) {
-            if (i == 0) std::cout << v.second[i] << ")";
-            else std::cout << v.second[i] << "->";
-        }
-    }
-    std::cout << "\n--------------";
-}
-
 #endif //DA_PROJECT_CASE2_H

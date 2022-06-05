@@ -73,21 +73,22 @@ void case_1_2() {
     }
 
     graph.pareto_optimal(src, dest);
-    std::vector<std::pair<int, std::vector<int>>> paths = graph.optimal_paths(src, dest);
+    std::vector<std::pair<int, std::vector<int>>> paths;
+    paths = graph.optimal_paths(src, dest);
     std::cout << "\n## Paths ##";
     if(paths.empty()){
         std::cout << "\n--------------\n"
                   << "Unfortunately there are no paths\n(you'll have to walk)";
     }
     for(auto v : paths){
-        std::cout << "\n--------------";
-        std::cout << "\nNumber of transitions: " << v.second.size()-1
-                  << "\nCapacity: " << v.first
-                  << "\nPath: (";
-        for(int i=v.second.size()-1;i>=0;i--){
-            if(i==0) std::cout << v.second[i] << ")";
-            else std::cout << v.second[i] << "->";
-        }
+            std::cout << "\n--------------";
+            std::cout << "\nNumber of transitions: " << v.second.size() - 2
+                      << "\nCapacity: " << v.first
+                      << "\nPath: (";
+            for (int i = v.second.size() - 1; i >= 0; i--) {
+                if (i == 0) std::cout << v.second[i] << ")";
+                else std::cout << v.second[i] << "->";
+            }
     }
     std::cout << "\n--------------";
 

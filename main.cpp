@@ -9,8 +9,8 @@
 
 int main() {
 
-    case_2();
-//    case_2_1();
+    case_1_2();
+
     return 0;
 
 }
