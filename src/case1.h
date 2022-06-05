@@ -9,6 +9,22 @@
 #include "exception.h"
 #include "utils.h"
 
+void case_1_1();
+void case_1_2();
+
+void case_1(){
+    int opt;
+    while(1) {
+        std::cout << "[1] Line 1\n[2] Line 2\n\n[0] Exit\n";
+        std::cin >> opt;
+        switch(opt){
+            case 0: return;
+            case 1: case_1_1(); break;
+            case 2: case_1_2(); break;
+            default: std::cout << "Invalid option\n";
+        }
+    }
+}
 
 void case_1_1() {
     std::cout << "### Case 1.1 ###\n";
